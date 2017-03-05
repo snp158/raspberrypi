@@ -1,0 +1,94 @@
+<!CTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="viewport" content = "height = device-height, width = device-width, user-scalable = no">
+    <title>СНТ "Захарово" контроль температуры</title>
+    <script type="text/javascript" src="/webiopi.js"></script>
+    <script type="text/javascript">
+        var iONOFF = 0;
+        webiopi().ready(function() {
+
+                webiopi().callMacro("getData_DH11", [], getData_DH11_Callback);
+                webiopi().callMacro("getData_MQ2", [], getData_MQ2_Callback);
+
+                // Create a "Light" labeled button for GPIO  22
+                var button = webiopi().createGPIOButton(22, "LIGHT");
+
+                // Append the button to the controls box
+                $("#controls").append(button);
+                // pass true to refresh repeatedly of false to refresh once
+                webiopi().refreshGPIO(true);
+        });
+	// Every 5000ms (5 seconds) Call the function to go get the data from Python
+	setInterval ("getData_DH11()", 5000);
+        setInterval ("getData_MQ2()", 1000);
+        //=================================================================
+	// Go get the Data from the Python Macro getData
+        function getData_DH11(){
+    		     webiopi().callMacro("getData_DH11", [], getData_DH11_Callback);
+	         }
+        function getData_MQ2(){
+                     webiopi().callMacro("getData_MQ2", [], getData_MQ2_Callback);
+                 }
+        //=================================================================
+	// Calback functions:
+	function getData_DH11_Callback(macro, args, data){
+			//Parse data from python macro getData
+			var iData = JSON.parse(data);
+		 	    divDATETIME.innerHTML = "Time="+iData[0];	//datetime
+			    divTEMP.innerHTML	  = "Temp="+iData[1];	//temperature
+		            divHUMIDITY.innerHTML = "Humidity="+iData[2];	//humidity
+	}
+        function getData_MQ2_Callback(macro, args, data){
+                 var iData = JSON.parse(data);
+                 divDATETIME.innerHTML = "Time="+iData[0];   //datetime
+                 if (iData[1]==1){
+                    divGAS.style.backgroundColor = "red";
+                    divGAS.innerHTML      = "GAS ALARM";
+                 }else{
+                    divGAS.style.backgroundColor = "blue";
+                    divGAS.innerHTML      = "GAS Ok!"; 
+                 }
+        }
+    </script>
+    <style type="text/css">
+        button {
+            display: block;
+            margin: 5px 5px 5px 5px;
+            width: 160px;
+            height: 45px;
+            font-size: 24pt;
+            font-weight: bold;
+            color: white;
+        }
+        #gpio22.LOW {
+            background-color: Black;
+        }
+
+        #gpio22.HIGH {
+            background-color: Blue;
+        }
+        #gas.ALARM {
+            background-color: red;
+        }
+        #gas.OK {
+            background-color: blue;
+        }
+    </style>
+</head>
+<body>
+   <div id="content" align="center">
+		<table align="center" border="1" width="160px"></tr>
+			<tr><td><div id="divDATETIME"></div></td></tr>
+			<tr><td><div id="divTEMP"></div></td></tr>	
+			<tr><td><div id="divHUMIDITY"></div></td></tr>
+                        <tr><td><div id="divGAS" class="gas.OK"></div></td></tr>
+                        <tr><td><div id="controls"></div></td></tr>
+
+		</table>
+	</div>
+</body>
+</html>
+
