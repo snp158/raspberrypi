@@ -1,9 +1,9 @@
 #!/bin/bash
  
-#HOST=murino.ddns.net
+#HOST=
 HOST=192.168.2.1
-PPTPUSER=zaharovo
-PPTPPASS=Pandora2016$
+PPTPUSER=
+PPTPPASS=
  
 DATE=`date`
 PINGRES=`ping -c 2 $HOST`
